@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>蒼璃的个人介绍</title>
+<style>
+  /* Reset */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    color: #333;
+  }
+  .container {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+    max-width: 640px;
+    width: 100%;
+    aspect-ratio: 1 / 1.618;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 32px;
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+  }
+  .container:hover {
+    box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+  }
+  h1 {
+    color: #4a90e2;
+    font-weight: 700;
+    font-size: 2.8rem;
+    margin-bottom: 20px;
+    letter-spacing: 1.2px;
+  }
+  p.intro {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #555;
+    white-space: pre-line;
+    text-align: left;
+    flex-grow: 1;
+    margin-bottom: 12px;
+    overflow-y: auto;
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #4a90e2 #e0e0e0;
+  }
+  /* 自定义滚动条 Webkit */
+  p.intro::-webkit-scrollbar {
+    width: 8px;
+  }
+  p.intro::-webkit-scrollbar-track {
+    background: #e0e0e0;
+    border-radius: 4px;
+  }
+  p.intro::-webkit-scrollbar-thumb {
+    background-color: #4a90e2;
+    border-radius: 4px;
+  }
+  .divider {
+    height: 1px;
+    background: #e6e9f0;
+    margin: 0 0 32px 0;
+  }
+  .skills {
+    margin-bottom: 36px;
+  }
+  .skill-tag {
+    display: inline-block;
+    background: #4a90e2;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 9999px;
+    font-size: 1rem;
+    margin: 6px 8px;
+    user-select: none;
+    box-shadow: 0 3px 10px rgba(74,144,226,0.45);
+    transition: background-color 0.3s ease, transform 0.25s ease;
+    cursor: default;
+  }
+  .skill-tag:hover {
+    background-color: #357ABD;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(53,122,189,0.65);
+  }
+  .contact {
+    font-size: 1.05rem;
+    margin-bottom: 40px;
+    line-height: 1.5;
+    color: #444;
+  }
+  .contact a {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  .contact a:hover {
+    text-decoration: underline;
+    color: #2b5d9f;
+  }
+  .btn-primary {
+    background: #4a90e2;
+    color: white;
+    padding: 16px 40px;
+    border: none;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(74,144,226,0.45);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+    user-select: none;
+    align-self: center;
+    min-width: 200px;
+  }
+  .btn-primary:hover {
+    background: #357ABD;
+    box-shadow: 0 10px 28px rgba(53,122,189,0.75);
+  }
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+  .motto {
+    margin-top: 48px;
+    font-style: italic;
+    color: #777;
+    font-size: 1rem;
+    text-align: center;
+    user-select: none;
+    letter-spacing: 0.04em;
+  }
+  @media (max-width: 480px) {
+    .container {
+      aspect-ratio: auto;
+      max-width: 92vw;
+      padding: 28px 20px;
+      height: auto;
+    }
+    h1 {
+      font-size: 2.2rem;
+    }
+    p.intro {
+      font-size: 1rem;
+      margin-bottom: 28px;
+    }
+    .skill-tag {
+      font-size: 0.9rem;
+      padding: 6px 14px;
+      margin: 5px 6px;
+    }
+    .contact {
+      font-size: 1rem;
+      margin-bottom: 32px;
+    }
+    .btn-primary {
+      width: 100%;
+      min-width: unset;
+      padding: 16px 0;
+    }
+    .motto {
+      font-size: 0.9rem;
+      margin-top: 32px;
+    }
+  }
+  
+</style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="蒼璃的个人介绍">
+    <h1>你好，我是蒼璃</h1>
+    <p class="intro" tabindex="0" aria-label="个人简介">
+我是一名普通的编程爱好者，喜欢探索各种编程语言和技术。  
+目前主要学习 JavaScript、HTML 和 CSS，热衷于前端开发。  
+我享受用代码解决问题的过程，也期待不断提升自己的能力。  
+未来希望能够成为一名全栈开发者，参与有趣且有意义的项目。  
+欢迎通过 GitHub 与我交流。
+    </p>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="skills" aria-label="技能标签">
+      <span class="skill-tag" tabindex="0">JavaScript</span>
+      <span class="skill-tag" tabindex="0">HTML</span>
+      <span class="skill-tag" tabindex="0">CSS</span>
+      <span class="skill-tag" tabindex="0">Python</span>
+      <span class="skill-tag" tabindex="0">Java</span>
+    </div>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="contact" aria-label="联系方式">
+      GitHub: <a href="https://github.com/yourname" target="_blank" rel="noopener noreferrer">github.com/yourname</a><br />
+      邮箱: <a href="mailto:your.email@example.com">your.email@example.com</a>
+    </div>
+    <button class="btn-primary" onclick="alert('谢谢你的关注！')" aria-label="打招呼按钮">点我打个招呼</button>
+    <p class="motto">“保持好奇，永远学习。”</p>
+  </div>
+</body>
+</html>
