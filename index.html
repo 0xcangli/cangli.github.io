@@ -1,1 +1,220 @@
-Hello World
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的博客</title>
+    <!-- 引入Vue.js -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 引入样式库 -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- 引入优雅字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- 引入图标 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #fafafa;
+            color: #4a4a4a;
+        }
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .blog-post {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+        .blog-post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .soft-nav {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .soft-button {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        .soft-button:hover {
+            background: #e8e8e8;
+            color: #333;
+        }
+        .profile-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+        .soft-footer {
+            background: #fff;
+            border-top: 1px solid #eee;
+        }
+        .soft-icon {
+            color: #666;
+            margin-right: 5px;
+        }
+        .soft-title {
+            color: #333;
+            font-weight: 500;
+        }
+        .soft-link {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .soft-link:hover {
+            color: #333;
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #666;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="min-h-screen">
+        <!-- 导航栏 -->
+        <nav class="soft-nav shadow-sm">
+            <div class="blog-container">
+                <div class="flex justify-between items-center py-4">
+                    <h1 class="text-2xl font-medium soft-title">
+                        {{ blogTitle }}
+                    </h1>
+                    <div class="space-x-6">
+                        <a v-for="item in navItems" 
+                           :key="item.id" 
+                           :href="item.link" 
+                           class="soft-link nav-link">
+                            {{ item.name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容区 -->
+        <main class="blog-container py-8">
+            <!-- 个人信息卡片 -->
+            <div class="profile-card p-6 mb-8">
+                <div class="flex items-center space-x-6">
+                    <img :src="profile.avatar" alt="头像" class="w-20 h-20 rounded-full border-2 border-gray-100">
+                    <div>
+                        <h2 class="text-xl font-medium soft-title">{{ profile.name }}</h2>
+                        <p class="text-gray-600 mt-1">{{ profile.bio }}</p>
+                        <div class="mt-3">
+                            <a :href="profile.github" target="_blank" class="soft-button inline-flex items-center">
+                                <i class="fab fa-github mr-2"></i>
+                                GitHub主页
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 博客文章列表 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <article v-for="post in blogPosts" 
+                         :key="post.id" 
+                         class="blog-post overflow-hidden">
+                    <img :src="post.coverImage" :alt="post.title" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-lg font-medium soft-title mb-3">{{ post.title }}</h3>
+                        <p class="text-gray-600 mb-4">{{ post.excerpt }}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">
+                                <i class="far fa-calendar-alt soft-icon"></i>
+                                {{ post.date }}
+                            </span>
+                            <a :href="post.link" class="soft-button">
+                                阅读更多
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="soft-footer mt-8">
+            <div class="blog-container py-6">
+                <div class="text-center text-gray-500">
+                    <p>
+                        &copy; {{ new Date().getFullYear() }} {{ blogTitle }}. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    blogTitle: 'MyBlog',
+                    profile: {
+                        name: '蒼璃',
+                        bio: '分享生活，记录成长',
+                        avatar: 'https://avatars.githubusercontent.com/u/174418702?v=4',
+                        github: 'https://github.com/0xcangli'
+                    },
+                    navItems: [
+                        { id: 1, name: '首页', link: '#' },
+                        { id: 2, name: '文章', link: '#' },
+                        { id: 3, name: '项目', link: '#' },
+                        { id: 4, name: '关于', link: '#' }
+                    ],
+                    blogPosts: [
+                        {
+                            id: 1,
+                            title: '生活随笔',
+                            excerpt: '记录生活中的点点滴滴，分享美好时刻...',
+                            date: '2024-03-20',
+                            coverImage: 'https://source.unsplash.com/400x200/?nature',
+                            link: '#'
+                        },
+                        {
+                            id: 2,
+                            title: '读书笔记',
+                            excerpt: '分享最近阅读的好书，记录阅读心得...',
+                            date: '2024-03-18',
+                            coverImage: 'https://source.unsplash.com/400x200/?book',
+                            link: '#'
+                        },
+                        {
+                            id: 3,
+                            title: '旅行日记',
+                            excerpt: '记录旅途中的风景和故事...',
+                            date: '2024-03-15',
+                            coverImage: 'https://source.unsplash.com/400x200/?travel',
+                            link: '#'
+                        }
+                    ]
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
