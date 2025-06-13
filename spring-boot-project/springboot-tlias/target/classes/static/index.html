@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>企业管理系统</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* 侧边栏样式 */
+    .sidebar {
+      width: 200px;
+      background-color: #304156;
+      color: white;
+      padding: 20px 0;
+    }
+
+    .sidebar-header {
+      padding: 0 20px;
+      margin-bottom: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .nav-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .nav-item:hover {
+      background-color: #263445;
+    }
+
+    .nav-item.active {
+      background-color: #1890ff;
+    }
+
+    /* 主内容区域样式 */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+
+    .content-header {
+      background-color: white;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 通用样式 */
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-primary {
+      background-color: #409EFF;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #f56c6c;
+      color: white;
+    }
+
+    .btn-cancel {
+      background-color: #909399;
+      color: white;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+    }
+
+    /* 表格样式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* 弹窗样式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      width: 480px;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal h3 {
+      margin-top: 0;
+      color: #303133;
+      border-bottom: 2px solid #EBEEF5;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .modal .form-group {
+      margin-bottom: 20px;
+    }
+
+    .modal .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #606266;
+      font-weight: 500;
+    }
+
+    .modal .form-group input,
+    .modal .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #DCDFE6;
+      border-radius: 6px;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .modal .form-group input:focus,
+    .modal .form-group select:focus {
+      border-color: #409EFF;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(64,158,255,0.2);
+    }
+
+    .modal .form-group input[type="file"] {
+      padding: 8px;
+      border: 2px dashed #DCDFE6;
+      background: #F5F7FA;
+      cursor: pointer;
+    }
+
+    .modal .form-group input[type="file"]:hover {
+      border-color: #409EFF;
+    }
+
+    .modal .form-group img {
+      margin-top: 12px;
+      border: 2px solid #EBEEF5;
+      transition: all 0.3s;
+    }
+
+    .modal .form-group img:hover {
+      border-color: #409EFF;
+    }
+
+    .modal .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #EBEEF5;
+    }
+
+    .modal .btn {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+
+    .modal .btn-primary {
+      background-color: #409EFF;
+      color: white;
+    }
+
+    .modal .btn-primary:hover {
+      background-color: #66b1ff;
+      transform: translateY(-1px);
+    }
+
+    .modal .btn-cancel {
+      background-color: #F5F7FA;
+      color: #606266;
+      border: 1px solid #DCDFE6;
+    }
+
+    .modal .btn-cancel:hover {
+      background-color: #EBEEF5;
+      color: #303133;
+    }
+
+    /* Toast提示样式 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #67C23A;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast.error {
+      background-color: #F56C6C;
+    }
+
+    /* 搜索栏样式 */
+    .search-bar {
+      background: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .search-bar form {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-bar .form-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-bar input[type="text"],
+    .search-bar select,
+    .search-bar input[type="date"] {
+      padding: 6px 12px;
+      border: 1px solid #DCDFE6;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+
+    /* 分页样式 */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      gap: 15px;
+    }
+
+    .pagination button {
+      padding: 6px 12px;
+      border: 1px solid #DCDFE6;
+      background-color: white;
+      color: #606266;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .pagination button:disabled {
+      background-color: #F5F7FA;
+      color: #C0C4CC;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <!-- 顶部提示 -->
+  <div v-if="toastMessage" :class="['toast', toastType]">
+    {{ toastMessage }}
+  </div>
+
+  <div class="container">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="sidebar-header">企业管理系统</div>
+      <div class="nav-item" 
+           :class="{ active: currentView === 'home' }"
+           @click="currentView = 'home'">
+          首页
+      </div>
+      <div class="nav-item" 
+           :class="{ active: currentView === 'dept' }"
+           @click="currentView = 'dept'">
+          部门管理
+      </div>
+      <div class="nav-item" 
+           :class="{ active: currentView === 'emp' }"
+           @click="currentView = 'emp'">
+          员工管理
+      </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+      <!-- 首页 -->
+      <div v-if="currentView === 'home'" class="content-header">
+        <h2>欢迎使用企业管理系统</h2>
+        <p>请从左侧菜单选择要管理的功能</p>
+      </div>
+
+      <!-- 部门管理 -->
+      <div v-if="currentView === 'dept'">
+        <div class="content-header">
+          <h2>部门管理</h2>
+        </div>
+        
+        <!-- 部门搜索栏 -->
+        <div class="search-bar">
+          <input v-model="deptSearchName" placeholder="搜索部门名" type="text">
+          <button class="btn btn-primary" @click="fetchDepts">搜索</button>
+        </div>
+
+        <!-- 添加部门按钮 -->
+        <button class="btn btn-primary" @click="openDeptForm">添加部门</button>
+
+        <!-- 部门表格 -->
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>名称</th>
+              <th>创建时间</th>
+              <th>更新时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="dept in filteredDepts" :key="dept.id">
+              <td>{{ dept.id }}</td>
+              <td>{{ dept.name }}</td>
+              <td>{{ dept.createTime }}</td>
+              <td>{{ dept.updateTime }}</td>
+              <td>
+                <button class="btn btn-primary" @click="editDept(dept)">修改</button>
+                <button class="btn btn-danger" @click="deleteDept(dept.id)">删除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 员工管理 -->
+      <div v-if="currentView === 'emp'">
+        <div class="content-header">
+          <h2>员工管理</h2>
+        </div>
+
+        <!-- 员工搜索栏 -->
+        <form class="search-bar" @submit.prevent="searchEmp">
+          <div class="form-group">
+            <label for="name">姓名</label>
+            <input type="text" id="name" v-model="empSearch.name" placeholder="请输入姓名">
+          </div>
+
+          <div class="form-group">
+            <label for="gender">性别</label>
+            <select id="gender" v-model="empSearch.gender">
+              <option value="">不限</option>
+              <option value="1">男</option>
+              <option value="2">女</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="department">部门</label>
+            <select id="department" v-model.number="empSearch.deptId">
+              <option value="">不限</option>
+              <option v-for="dept in depts" :key="dept.id" :value="dept.id">
+                {{ dept.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="startTime">开始时间</label>
+            <input type="date" id="startTime" v-model="empSearch.startDate">
+            <label for="endTime">结束时间</label>
+            <input type="date" id="endTime" v-model="empSearch.endDate">
+          </div>
+
+          <button type="submit" class="btn btn-primary">搜索</button>
+        </form>
+
+        <!-- 添加员工按钮 -->
+        <button class="btn btn-primary" @click="openEmpForm">添加员工</button>
+        <!-- 批量删除按钮 -->
+        <button class="btn btn-primary" @click="deleteSelected">批量删除</button>
+
+        <!-- 员工表格 -->
+        <table v-if="emps.length">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll" @change="toggleAll" v-model="selectAll"/></th>
+              <th>ID</th>
+              <th>头像</th>
+              <th>用户名</th>
+              <th>姓名</th>
+              <th>性别</th>
+              <th>电话</th>
+              <th>部门</th>
+              <th>职位</th>
+              <th>薪资</th>
+              <th>入职日期</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="emp in emps" :key="emp.id">
+              <td><input type="checkbox" class="rowCheckbox" v-model="emp.checked" /></td>
+              <td>{{ emp.id }}</td>
+              <td>
+                <img :src="emp.image || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzkwOTM5OSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MyLjY3IDAgNC44NCAyLjE3IDQuODQgNC44NCAwIDIuNjctMi4xNyA0Ljg0LTQuODQgNC44NC0yLjY3IDAtNC44NC0yLjE3LTQuODQtNC44NCAwLTIuNjcgMi4xNy00Ljg0IDQuODQtNC44NHptMCAxMmM0LjQyIDAgOC4xNy0yLjI4IDkuNTQtNS41NS0yLjY5LTQuMDctNy4yOC02LjU1LTEyLjA0LTYuNTUtNC43NiAwLTkuMzUgMi40OC0xMi4wNCA2LjU1IDEuMzcgMy4yNyA1LjEyIDUuNTUgOS41NCA1LjU1eiIvPjwvc3ZnPg=='" 
+                     width="40" height="40" 
+                     style="border-radius: 50%; object-fit: cover;">
+              </td>
+              <td>{{ emp.username }}</td>
+              <td>{{ emp.name }}</td>
+              <td>{{ genderMap[emp.gender] }}</td>
+              <td>{{ emp.phone }}</td>
+              <td>{{ emp.dept }}</td>
+              <td>{{ emp.job || '无' }}</td>
+              <td>{{ emp.salary || '无' }}</td>
+              <td>{{ emp.entryDate }}</td>
+              <td>
+                <button class="btn btn-primary" @click="editEmp(emp)">修改</button>
+                <button class="btn btn-danger" @click="deleteEmp(emp.id)">删除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else>暂无数据</p>
+
+        <!-- 分页 -->
+        <div class="pagination">
+          <button @click="prevPage" :disabled="page === 1">上一页</button>
+          <span>第 {{ page }} 页 / 共 {{ totalPages }} 页</span>
+          <button @click="nextPage" :disabled="page === totalPages">下一页</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 部门表单弹窗 -->
+  <div class="modal-overlay" v-if="showDeptForm">
+    <div class="modal">
+      <h3>{{ deptForm.id ? '修改部门' : '添加部门' }}</h3>
+      <div class="form-group">
+        <label>部门名称</label>
+        <input v-model="deptForm.name" type="text">
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" @click="saveDept">保存</button>
+        <button class="btn btn-cancel" @click="showDeptForm = false">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 员工表单弹窗 -->
+  <div class="modal-overlay" v-if="showEmpForm">
+    <div class="modal">
+      <h3>{{ empForm.id ? '修改员工' : '添加员工' }}</h3>
+      <form @submit.prevent="saveEmp">
+        <div class="form-group">
+          <label>头像</label>
+          <input type="file" @change="handleAvatarUpload" accept="image/*">
+          <img v-if="empForm.image" :src="empForm.image" width="100" height="100">
+        </div>
+        <div class="form-group">
+          <label>用户名</label>
+          <input v-model="empForm.username" type="text" required>
+        </div>
+        <div class="form-group">
+          <label>姓名</label>
+          <input v-model="empForm.name" type="text" required>
+        </div>
+        <div class="form-group">
+          <label>性别</label>
+          <select v-model="empForm.gender" required>
+            <option value="1">男</option>
+            <option value="2">女</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>电话</label>
+          <input v-model="empForm.phone" type="tel" required>
+        </div>
+        <div class="form-group">
+          <label>部门</label>
+          <select v-model="empForm.deptId" required>
+            <option v-for="dept in depts" :key="dept.id" :value="dept.id">
+              {{ dept.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>职位</label>
+          <input v-model="empForm.job" type="text" required>
+        </div>
+        <div class="form-group">
+          <label>薪资</label>
+          <input v-model="empForm.salary" type="number" required>
+        </div>
+        <div class="form-group">
+          <label>入职日期</label>
+          <input v-model="empForm.entryDate" type="date" required>
+        </div>
+        <!-- 添加工作经历部分 -->
+        <div class="form-group">
+          <label>工作经历</label>
+          <div v-for="(exp, index) in empForm.children" :key="index" class="experience-item" style="margin-bottom: 15px; padding: 10px; border: 1px solid #DCDFE6; border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <h4 style="margin: 0;">经历 #{{index + 1}}</h4>
+              <button type="button" class="btn btn-danger" @click="removeExperience(index)" style="padding: 2px 8px;">删除</button>
+            </div>
+            <div class="form-group">
+              <label>开始日期</label>
+              <input v-model="exp.begin" type="date" required>
+            </div>
+            <div class="form-group">
+              <label>结束日期</label>
+              <input v-model="exp.end" type="date" required>
+            </div>
+            <div class="form-group">
+              <label>公司名称</label>
+              <input v-model="exp.company" type="text" required>
+            </div>
+            <div class="form-group">
+              <label>职位</label>
+              <input v-model="exp.job" type="text" required>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" @click="addExperience" style="margin-top: 10px;">添加工作经历</button>
+        </div>
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">保存</button>
+          <button type="button" class="btn btn-cancel" @click="showEmpForm = false">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+const { createApp, ref, computed } = Vue;
+
+createApp({
+  setup() {
+    // 视图控制
+    const currentView = ref('home');
+
+    // 部门管理相关
+    const depts = ref([]);
+    const deptSearchName = ref('');
+    const showDeptForm = ref(false);
+    const deptForm = ref({ id: null, name: '' });
+
+    // 员工管理相关
+    //设置computed属性
+    const selectAll = computed({
+      get() {
+        return emps.value.length > 0 && emps.value.every(emp => emp.checked);
+      },
+      set(value) {
+        emps.value.forEach(emp => emp.checked = value);
+      }
+    });
+
+    const emps = ref([]);
+    const empSearch = ref({
+      name: '',
+      gender: '',
+      deptId: '',
+      startDate: '',
+      endDate: ''
+    });
+    const showEmpForm = ref(false);
+    const empForm = ref({
+      id: null,
+      username: '',
+      name: '',
+      gender: '',
+      phone: '',
+      deptId: '',
+      job: '',
+      salary: '',
+      entryDate: '',
+      image: '',
+      avatarFile: null,
+      children: [] // 添加工作经历数组
+    });
+
+
+    // 分页相关
+    const page = ref(1);
+    const pageSize = ref(10);
+    const total = ref(0);
+    const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
+
+    // 提示消息
+    const toastMessage = ref('');
+    const toastType = ref('');
+
+    const genderMap = {
+      '1': '男',
+      '2': '女'
+    };
+
+    // 通用方法
+    const showToast = (msg, type = 'success') => {
+      toastMessage.value = msg;
+      toastType.value = type === 'success' ? '' : 'error';
+      setTimeout(() => toastMessage.value = '', 3000);
+    };
+
+    // 部门管理方法
+    const fetchDepts = () => {
+      axios.get('/depts')
+        .then(res => {
+          depts.value = res.data.data;
+        })
+        .catch(() => showToast('获取部门失败', 'error'));
+    };
+
+    const filteredDepts = computed(() => {
+      return depts.value.filter(dept =>
+        dept.name.toLowerCase().includes(deptSearchName.value.toLowerCase())
+      );
+    });
+
+    const openDeptForm = () => {
+      deptForm.value = { id: null, name: '' };
+      showDeptForm.value = true;
+    };
+
+    const editDept = (dept) => {
+      deptForm.value = { ...dept };
+      showDeptForm.value = true;
+    };
+
+    const saveDept = () => {
+      const action = deptForm.value.id ? axios.put : axios.post;
+      action('/depts', deptForm.value)
+        .then(() => {
+          fetchDepts();
+          fetchEmps();
+          showDeptForm.value = false;
+          showToast(deptForm.value.id ? '修改成功' : '添加成功');
+        })
+        .catch(() => showToast('保存失败', 'error'));
+    };
+
+    const deleteDept = (id) => {
+      if (confirm('确定删除该部门吗？')) {
+        axios.delete(`/depts/${id}`)
+          .then(() => {
+            fetchDepts();
+            showToast('删除成功');
+          })
+          .catch(() => showToast('删除失败', 'error'));
+      }
+    };
+
+    // 员工管理方法
+    //全选
+    const toggleAll = () => {
+      emps.value.forEach(emp => {
+        emp.checked = selectAll.value;
+      });
+    };
+    // 批量删除
+    const deleteSelected = () => {
+      const selectedIds = emps.value.filter(emp => emp.checked).map(emp => emp.id);
+      if (selectedIds.length === 0) {
+        alert('请先选择要删除的员工');
+        return;
+      }
+
+      // 发送删除请求
+      axios.delete('/emps', {
+        data: selectedIds
+      }).then(res => {
+        // fetchDepts();
+        fetchEmps();
+        showToast("删除成功");
+      }).catch(() => showToast("删除失败"));
+
+      // 本地模拟删除
+      // emps.value = emps.value.filter(emp => !selectedIds.includes(emp.id));
+    };
+
+    const fetchEmps = async () => {
+      try {
+        const response = await axios.get('/emps', {
+          params: {
+            page: page.value,
+            size: pageSize.value,
+            name: empSearch.value.name || null,
+            gender: empSearch.value.gender || null,
+            deptId: empSearch.value.deptId || null,
+            startDate: empSearch.value.startDate || null,
+            endDate: empSearch.value.endDate || null
+          }
+        });
+        
+        if (response.data.code === 1) {
+          emps.value = response.data.data.rows.map(emp => ({
+            ...emp,
+            checked: false
+          }));
+          total.value = response.data.data.total;
+        } else {
+          showToast(response.data.msg || '获取数据失败', 'error');
+        }
+      } catch (error) {
+        console.error('获取员工列表失败:', error);
+        showToast('网络连接失败，请检查服务器是否正常运行', 'error');
+      }
+    };
+
+    const searchEmp = async () => {
+      try {
+        page.value = 1;
+        const response = await axios.get('/emps', {
+          params: {
+            page: page.value,
+            size: pageSize.value,
+            name: empSearch.value.name || null,
+            gender: empSearch.value.gender || null,
+            deptId: empSearch.value.deptId || null,
+            startDate: empSearch.value.startDate || null,
+            endDate: empSearch.value.endDate || null
+          }
+        });
+        
+        if (response.data.code === 1) {
+          emps.value = response.data.data.rows.map(emp => ({
+            ...emp,
+            checked: false
+          }));
+          total.value = response.data.data.total;
+        } else {
+          showToast(response.data.msg || '查询失败', 'error');
+        }
+      } catch (error) {
+        console.error('搜索员工失败:', error);
+        showToast('网络连接失败，请检查服务器是否正常运行', 'error');
+      }
+    };
+
+    const openEmpForm = () => {
+      empForm.value = {
+        id: null,
+        username: '',
+        name: '',
+        gender: '',
+        phone: '',
+        deptId: '',
+        job: '',
+        salary: '',
+        entryDate: '',
+        image: '',
+        avatarFile: null,
+        children: [] // 重置工作经历
+      };
+      showEmpForm.value = true;
+    };
+
+    const editEmp = async (emp) => {
+      try {
+        console.log('开始获取员工详情，员工ID:', emp.id);
+        // 获取员工的详细信息，包括工作经历
+        const response = await axios.get(`/emps/${emp.id}`);
+        console.log('获取员工详情响应:', response);
+        
+        if (response.data.code === 1) {
+          const empDetail = response.data.data;
+          console.log('员工详情数据:', empDetail);
+          
+          // 确保工作经历数据存在
+          if (!empDetail.children) {
+            empDetail.children = [];
+          }
+          
+          // 确保 deptId 和 entryDate 字段存在
+          empForm.value = { 
+            ...empDetail,
+            deptId: empDetail.deptId || empDetail.dept?.id, // 尝试从 dept 对象中获取 id
+            entryDate: empDetail.entryDate || empDetail.entrydate, // 处理可能的字段名不一致
+            children: empDetail.children || []
+          };
+          console.log('设置到表单的数据:', empForm.value);
+          showEmpForm.value = true;
+        } else {
+          console.error('获取员工详情失败，响应码:', response.data.code, '错误信息:', response.data.msg);
+          showToast(response.data.msg || '获取员工详情失败', 'error');
+        }
+      } catch (error) {
+        console.error('获取员工详情失败，错误详情:', {
+          message: error.message,
+          response: error.response,
+          request: error.request,
+          config: error.config
+        });
+        
+        if (error.response) {
+          // 服务器返回了错误状态码
+          console.error('服务器响应:', error.response.data);
+          showToast(`获取员工详情失败: ${error.response.data.msg || error.response.statusText}`, 'error');
+        } else if (error.request) {
+          // 请求已发出但没有收到响应
+          console.error('未收到响应');
+          showToast('服务器未响应，请检查网络连接', 'error');
+        } else {
+          // 请求配置出错
+          console.error('请求配置错误');
+          showToast('请求配置错误', 'error');
+        }
+      }
+    };
+
+    const handleAvatarUpload = (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        empForm.value.image = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      
+      empForm.value.avatarFile = file;
+    };
+
+    const saveEmp = async () => {
+      try {
+        let imageUrl = empForm.value.image;
+        
+        if (empForm.value.avatarFile) {
+          const formData = new FormData();
+          formData.append('file', empForm.value.avatarFile);
+          const uploadRes = await axios.post('/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          imageUrl = uploadRes.data.data;
+        }
+
+        const submitData = {
+          ...empForm.value,
+          image: imageUrl,
+          deptId: empForm.value.deptId
+        };
+        delete submitData.avatarFile;
+
+        const url = '/emps';
+        const method = empForm.value.id ? axios.put : axios.post;
+        const response = await method(url, submitData);
+        
+        if (response.data.code === 1) {
+          // 如果是新增员工，需要处理工作经历
+          if (!empForm.value.id && empForm.value.children.length > 0) {
+            const empId = response.data.data.id;
+            const experiences = empForm.value.children.map(exp => ({
+              ...exp,
+              empId: empId
+            }));
+            await axios.post('/emps/', experiences);
+          } else if (empForm.value.id) {
+            // 如果是修改员工，需要更新工作经历
+            if (empForm.value.children.length > 0) {
+              const experiences = empForm.value.children.map(exp => ({
+                ...exp,
+                empId: empForm.value.id
+              }));
+              await axios.put('/emps/', experiences);
+            }
+          }
+          
+          showToast('保存成功');
+          showEmpForm.value = false;
+          fetchEmps();
+        } else {
+          showToast(response.data.msg || '保存失败', 'error');
+        }
+      } catch (error) {
+        console.error('保存员工失败:', error);
+        showToast('保存失败', 'error');
+      }
+    };
+
+    const deleteEmp = (id) => {
+      if (confirm('确定要删除该员工吗？')) {
+        axios.delete(`/emps`, {
+          data: [id],
+        })
+          .then(() => {
+            showToast('删除成功');
+            fetchEmps();
+          })
+          .catch(() => showToast('删除失败', 'error'));
+      }
+    };
+
+    const prevPage = () => {
+      if (page.value > 1) {
+        page.value--;
+        fetchEmps();
+      }
+    };
+
+    const nextPage = () => {
+      if (page.value < totalPages.value) {
+        page.value++;
+        fetchEmps();
+      }
+    };
+
+    // 添加工作经历
+    const addExperience = () => {
+      empForm.value.children.push({
+        id: null,
+        begin: '',
+        end: '',
+        company: '',
+        job: '',
+        empId: empForm.value.id // 如果是编辑状态，添加当前员工ID
+      });
+    };
+
+    // 删除工作经历
+    const removeExperience = async (index) => {
+      const exp = empForm.value.children[index];
+      if (exp.id) {
+        // 如果经历有ID，说明是已保存的经历，需要调用后端删除
+        try {
+          await axios.delete(`/emps/${exp.id}`);
+          showToast('删除工作经历成功');
+        } catch (error) {
+          console.error('删除工作经历失败:', error);
+          showToast('删除工作经历失败', 'error');
+          return; // 如果删除失败，不从前端移除
+        }
+      }
+      empForm.value.children.splice(index, 1);
+    };
+
+    // 初始化
+    fetchDepts();
+    fetchEmps();
+
+    return {
+      currentView,
+      depts,
+      deptSearchName,
+      filteredDepts,
+      showDeptForm,
+      deptForm,
+      emps,
+      empSearch,
+      showEmpForm,
+      empForm,
+      page,
+      totalPages,
+      total,
+      genderMap,
+      toastMessage,
+      toastType,
+      fetchDepts,
+      openDeptForm,
+      editDept,
+      saveDept,
+      deleteDept,
+      searchEmp,
+      openEmpForm,
+      editEmp,
+      saveEmp,
+      deleteEmp,
+      handleAvatarUpload,
+      prevPage,
+      nextPage,
+      addExperience,
+      removeExperience,
+      //复选框
+      selectAll,
+      toggleAll,
+      //批量删除
+      deleteSelected,
+    };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>

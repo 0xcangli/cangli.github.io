@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>员工管理系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            background-color: #409EFF;
+            color: white;
+            padding: 16px;
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .search-bar form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .search-bar .form-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .search-bar label {
+            color: #606266;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .search-bar input[type="text"],
+        .search-bar select,
+        .search-bar input[type="date"] {
+            padding: 6px 12px;
+            border: 1px solid #DCDFE6;
+            border-radius: 4px;
+            transition: all 0.3s;
+            width: 120px;
+            box-sizing: border-box;
+            height: 32px;
+        }
+
+        .search-bar input[type="text"]:focus,
+        .search-bar select:focus,
+        .search-bar input[type="date"]:focus {
+            border-color: #409EFF;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+        }
+
+        .search-bar button {
+            padding: 6px 20px;
+            background-color: #409EFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            height: 32px;
+            white-space: nowrap;
+        }
+
+        .search-bar button:hover {
+            background-color: #66b1ff;
+        }
+
+        .search-bar .date-range {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-bar .date-range input {
+            width: 130px;
+        }
+
+        .btn-primary {
+            background-color: #409EFF;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #f56c6c;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #909399;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .modal h3 {
+            margin-top: 0;
+            color: #303133;
+            border-bottom: 1px solid #EBEEF5;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal input[type="text"],
+        .modal input[type="tel"],
+        .modal input[type="number"],
+        .modal input[type="date"],
+        .modal select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #DCDFE6;
+            border-radius: 4px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .modal input:focus,
+        .modal select:focus {
+            border-color: #409EFF;
+            outline: none;
+        }
+
+        .modal label {
+            display: block;
+            margin-top: 10px;
+            color: #606266;
+            font-size: 14px;
+        }
+
+        .project-item {
+            background: #F5F7FA;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        #avatar-upload {
+            margin: 10px 0;
+        }
+
+        .avatar-label {
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        #avatarPreview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #DCDFE6;
+            transition: border-color 0.2s;
+            background-color: #F5F7FA;
+            display: block;
+        }
+
+        #avatarPreview:hover {
+            border-color: #409EFF;
+        }
+
+        .btn-primary:hover {
+            background-color: #66b1ff;
+        }
+
+        .btn-danger:hover {
+            background-color: #f78989;
+        }
+
+        .btn-cancel:hover {
+            background-color: #a6a9ad;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #67C23A;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.error {
+            background-color: #F56C6C;
+        }
+
+        /* 表格操作按钮样式 */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit {
+            background-color: #67C23A;
+            color: white;
+            padding: 4px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .btn-delete {
+            background-color: #F56C6C;
+            color: white;
+            padding: 4px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .btn-edit:hover {
+            background-color: #85ce61;
+        }
+
+        .btn-delete:hover {
+            background-color: #f78989;
+        }
+
+        /* 分页样式 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        .pagination button {
+            padding: 6px 12px;
+            border: 1px solid #DCDFE6;
+            background-color: white;
+            color: #606266;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button:disabled {
+            background-color: #F5F7FA;
+            color: #C0C4CC;
+            cursor: not-allowed;
+        }
+
+        .pagination button:not(:disabled):hover {
+            color: #409EFF;
+            border-color: #409EFF;
+        }
+
+        .pagination-info {
+            color: #606266;
+            font-size: 14px;
+        }
+
+        .pagination .page-size {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination select {
+            padding: 4px 8px;
+            border: 1px solid #DCDFE6;
+            border-radius: 4px;
+            color: #606266;
+        }
+
+        /* 表格中的头像样式 */
+        .avatar-cell img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #EBEEF5;
+            background-color: #F5F7FA;
+            display: block;
+        }
+
+        /* 表单中的头像预览样式 */
+        #avatarPreview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #DCDFE6;
+            transition: border-color 0.2s;
+            background-color: #F5F7FA;
+            display: block;
+        }
+
+        #avatarPreview:hover {
+            border-color: #409EFF;
+        }
+
+        .avatar-upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-label {
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+        }
+
+        .avatar-label::after {
+            content: '点击更换头像';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #909399;
+            white-space: nowrap;
+        }
+
+        /* 表单验证错误提示样式 */
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            color: #F56C6C;
+            font-size: 12px;
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+        }
+
+        .input-error {
+            border-color: #F56C6C !important;
+        }
+
+        .input-error:focus {
+            box-shadow: 0 0 0 2px rgba(245, 108, 108, 0.2) !important;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- 顶部提示 -->
+    <div v-if="toastMessage" :class="['toast', toastType]">
+        {{ toastMessage }}
+    </div>
+
+    <header>员工管理系统</header>
+
+    <!-- 搜索栏 -->
+    <form class="search-bar" @submit.prevent="search">
+        <div class="form-group">
+            <label for="name">姓名</label>
+            <input type="text" id="name" v-model="searchEmp.name" placeholder="请输入姓名">
+        </div>
+
+        <div class="form-group">
+            <label for="gender">性别</label>
+            <select id="gender" v-model="searchEmp.gender">
+                <option value="">不限</option>
+                <option value="1">男</option>
+                <option value="2">女</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="department">部门</label>
+            <select id="department" v-model.number="searchEmp.deptId">
+                <option value="">不限</option>
+                <option v-for="dept in depts" :key="dept.id" :value="dept.id">
+                    {{ dept.name }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group date-range">
+            <label for="startTime">开始时间</label>
+            <input type="date" id="startTime" v-model="searchEmp.startDate">
+            <label for="endTime">结束时间</label>
+            <input type="date" id="endTime" v-model="searchEmp.endDate">
+        </div>
+
+        <button type="submit">搜索</button>
+    </form>
+
+    <!-- 添加按钮 -->
+    <button class="btn-primary" @click="openAddForm">添加员工</button>
+
+    <!-- 弹窗表单 -->
+    <div class="modal-overlay" v-if="showForm">
+        <div class="modal">
+            <h3>{{ form.id ? '修改员工' : '添加员工' }}</h3>
+
+            <form @submit.prevent="submit">
+                <div>
+                    <label>头像URL:</label>
+                    <div class="avatar-upload-container">
+                        <label for="avatarInput" class="avatar-label">
+                            <img id="avatarPreview" :src="form.image || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzkwOTM5OSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MyLjY3IDAgNC44NCAyLjE3IDQuODQgNC44NCAwIDIuNjctMi4xNyA0Ljg0LTQuODQgNC44NC0yLjY3IDAtNC44NC0yLjE3LTQuODQtNC44NCAwLTIuNjcgMi4xNy00Ljg0IDQuODQtNC44NHptMCAxMmM0LjQyIDAgOC4xNy0yLjI4IDkuNTQtNS41NS0yLjY5LTQuMDctNy4yOC02LjU1LTEyLjA0LTYuNTUtNC43NiAwLTkuMzUgMi40OC0xMi4wNCA2LjU1IDEuMzcgMy4yNyA1LjEyIDUuNTUgOS41NCA1LjU1eiIvPjwvc3ZnPg=='" alt="点击上传头像">
+                        </label>
+                        <input type="file" id="avatarInput" accept="image/*" hidden @change="handleAvatarUpload" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>用户名:</label>
+                    <input v-model="form.username" 
+                           type="text" 
+                           :class="{ 'input-error': formErrors.username }"
+                           @input="handleInput('username', $event.target.value, validateUsername)"
+                           placeholder="请输入用户名">
+                    <div class="error-message" v-if="formErrors.username">{{ formErrors.username }}</div>
+                </div>
+                <div class="form-group">
+                    <label>姓名:</label>
+                    <input v-model="form.name" 
+                           type="text" 
+                           :class="{ 'input-error': formErrors.name }"
+                           @input="handleInput('name', $event.target.value, validateName)"
+                           placeholder="请输入姓名">
+                    <div class="error-message" v-if="formErrors.name">{{ formErrors.name }}</div>
+                </div>
+                <div class="form-group">
+                    <label>性别:</label>
+                    <select v-model="form.gender" required>
+                        <option value="">请选择</option>
+                        <option value="1">男</option>
+                        <option value="2">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>电话:</label>
+                    <input v-model="form.phone" 
+                           type="tel" 
+                           :class="{ 'input-error': formErrors.phone }"
+                           @input="handleInput('phone', $event.target.value, validatePhone)"
+                           placeholder="请输入11位手机号码">
+                    <div class="error-message" v-if="formErrors.phone">{{ formErrors.phone }}</div>
+                </div>
+                <div class="form-group">
+                    <label>职位:</label>
+                    <input v-model="form.job" 
+                           type="text" 
+                           :class="{ 'input-error': formErrors.job }"
+                           @input="handleInput('job', $event.target.value, validateJob)"
+                           placeholder="请输入职位">
+                    <div class="error-message" v-if="formErrors.job">{{ formErrors.job }}</div>
+                </div>
+                <div class="form-group">
+                    <label>薪资:</label>
+                    <input v-model="form.salary" 
+                           type="number" 
+                           :class="{ 'input-error': formErrors.salary }"
+                           @input="handleInput('salary', $event.target.value, validateSalary)"
+                           placeholder="请输入薪资">
+                    <div class="error-message" v-if="formErrors.salary">{{ formErrors.salary }}</div>
+                </div>
+                <div class="form-group">
+                    <label>入职日期:</label>
+                    <input v-model="form.entryDate" 
+                           type="date" 
+                           :class="{ 'input-error': formErrors.entryDate }"
+                           @input="handleInput('entryDate', $event.target.value, validateEntryDate)">
+                    <div class="error-message" v-if="formErrors.entryDate">{{ formErrors.entryDate }}</div>
+                </div>
+
+                <h4>项目经历</h4>
+                <div v-for="(proj, index) in form.children" :key="index" class="project-item">
+                    <div>
+                        <label>开始时间:</label>
+                        <input type="date" v-model="proj.begin" required>
+                    </div>
+                    <div>
+                        <label>结束时间:</label>
+                        <input type="date" v-model="proj.end" required>
+                    </div>
+                    <div>
+                        <label>公司:</label>
+                        <input type="text" v-model="proj.company" required>
+                    </div>
+                    <div>
+                        <label>职位:</label>
+                        <input type="text" v-model="proj.job" required>
+                    </div>
+                    <button type="button" class="btn-danger" @click="removeProject(index)">删除该项目</button>
+                </div>
+                <button type="button" class="btn-primary" @click="addProject">添加项目经历</button>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">提交</button>
+                    <button type="button" class="btn-cancel" @click="showForm = false">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 表格 -->
+    <!--员工表单-->
+    <table v-if="emps.length">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>头像</th>
+            <th>用户名</th>
+            <th>姓名</th>
+            <th>性别</th>
+            <th>电话</th>
+            <th>部门</th>
+            <th>职位</th>
+            <th>薪资</th>
+            <th>入职日期</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="emp in emps" :key="emp.id">
+            <td>{{ emp.id }}</td>
+            <td class="avatar-cell">
+                <img :src="emp.image || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzkwOTM5OSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MyLjY3IDAgNC44NCAyLjE3IDQuODQgNC44NCAwIDIuNjctMi4xNyA0Ljg0LTQuODQgNC44NC0yLjY3IDAtNC44NC0yLjE3LTQuODQtNC44NCAwLTIuNjcgMi4xNy00Ljg0IDQuODQtNC44NHptMCAxMmM0LjQyIDAgOC4xNy0yLjI4IDkuNTQtNS41NS0yLjY5LTQuMDctNy4yOC02LjU1LTEyLjA0LTYuNTUtNC43NiAwLTkuMzUgMi40OC0xMi4wNCA2LjU1IDEuMzcgMy4yNyA1LjEyIDUuNTUgOS41NCA1LjU1eiIvPjwvc3ZnPg=='" :alt="emp.name">
+            </td>
+            <td>{{ emp.username }}</td>
+            <td>{{ emp.name }}</td>
+            <td>{{ genderMap[emp.gender] }}</td>
+            <td>{{ emp.phone }}</td>
+            <td>{{ emp.dept }}</td>
+            <td>{{ emp.job==null?'无':emp.job }}</td>
+            <td>{{ emp.salary==null?'无':emp.salary }}</td>
+            <td>{{ emp.entryDate }}</td>
+            <!-- 员工表格中的操作按钮 -->
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-edit" @click="openEditModal(emp)">修改</button>
+                    <button class="btn-delete" @click="deleteEmp(emp.id)">删除</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p v-else>暂无数据</p>
+    <!-- 分页 -->
+    <div class="pagination">
+        <button @click="prevPage" :disabled="page === 1">上一页</button>
+        <div class="pagination-info">
+            <span>第 {{ page }} 页 / 共 {{ totalPages }} 页</span>
+            <span style="margin-left: 10px">共 {{ total }} 条</span>
+        </div>
+        <button @click="nextPage" :disabled="page === totalPages">下一页</button>
+        <div class="page-size">
+            <span>每页显示：</span>
+            <select v-model="pageSize" @change="handlePageSizeChange">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+    </div>
+    <div>部门{{searchEmp.deptId}}</div>
+    <div>开始时间{{searchEmp.startTime}}</div>
+    <div>结束时间{{searchEmp.endTime}}</div>
+
+
+    <!-- 弹窗模态框 -->
+    <div v-if="showModal" class="modal">
+        <div class="modal-content">
+            <h3>修改员工信息</h3>
+            <form @submit.prevent="submitEdit">
+                <label>头像：<input type="file" @change="onAvatarChange" /></label><br />
+                <img :src="form.image" v-if="form.image" width="80" /><br />
+
+                <label>用户名：<input v-model="form.username" required /></label><br />
+                <label>姓名：<input v-model="form.name" required /></label><br />
+                <label>性别：
+                    <select v-model="form.gender">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </label><br />
+                <label>电话：<input v-model="form.phone" /></label><br />
+                <label>部门：<input v-model="form.dept" /></label><br />
+                <label>职位：<input v-model="form.job" /></label><br />
+                <label>薪资：<input v-model="form.salary" type="number" /></label><br />
+                <label>入职日期：<input v-model="form.entryDate" type="date" /></label><br />
+
+                <!-- 项目经历部分 -->
+                <div v-for="(project, index) in form.projects" :key="index" class="project-item">
+                    <h4>项目 {{ index + 1 }}</h4>
+                    <label>公司：<input v-model="project.company" /></label><br />
+                    <label>职位：<input v-model="project.position" /></label><br />
+                    <label>开始时间：<input v-model="project.startDate" type="date" /></label><br />
+                    <label>结束时间：<input v-model="project.endDate" type="date" /></label><br />
+                    <button @click.prevent="removeProject(index)">删除项目</button><br />
+                </div>
+                <button @click.prevent="addProject">添加项目经历</button><br /><br />
+
+                <button type="submit">提交</button>
+                <button @click="showModal = false">取消</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const { createApp, ref, reactive, computed } = Vue;
+
+    createApp({
+        setup() {
+            const depts = ref([]);
+            const emps = ref([]);
+            const searchEmp = reactive({
+                name: '',
+                gender: '',
+                deptId: '',
+                startDate: '',
+                endDate: ''
+            });
+            const showForm = ref(false);
+            const isEditing = ref(false);
+            const form = ref({
+                id: null,
+                username: '',
+                name: '',
+                gender: '',
+                phone: '',
+                dept: '',
+                job: '',
+                salary: '',
+                entryDate: '',
+                image: '',
+                children: [],
+                avatarFile: null
+            });
+
+            const page = ref(1);
+            const pageSize = ref(10);
+            const total = ref(0);
+            const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
+
+            const toastMessage = ref('');
+            const toastType = ref('');
+
+            const genderMap = {
+                '1': '男',
+                '2': '女'
+            };
+
+            const showToast = (msg, type = 'success') => {
+                toastMessage.value = msg;
+                toastType.value = type === 'success' ? '' : 'error';
+                setTimeout(() => toastMessage.value = '', 3000);
+            };
+
+            const fetchDepts = () => {
+                axios.get('/depts').then(res => {
+                    depts.value = res.data.data;
+                });
+            };
+
+            const fetchData = () => {
+                axios.get('/emps', {
+                    params: {
+                        page: page.value,
+                        size: pageSize.value,
+                        ...searchEmp
+                    }
+                }).then(res => {
+                    emps.value = res.data.data.rows;
+                    total.value = res.data.data.total;
+                });
+            };
+
+            const prevPage = () => {
+                if (page.value > 1) {
+                    page.value--;
+                    fetchData();
+                }
+            };
+
+            const nextPage = () => {
+                if (page.value < totalPages.value) {
+                    page.value++;
+                    fetchData();
+                }
+            };
+
+            const search = () => {
+                page.value = 1;
+                fetchData();
+            };
+
+            const openAddForm = () => {
+                isEditing.value = false;
+                form.value = {
+                    id: null,
+                    username: '',
+                    name: '',
+                    gender: '',
+                    phone: '',
+                    dept: '',
+                    job: '',
+                    salary: '',
+                    entryDate: '',
+                    image: '',
+                    children: [],
+                    avatarFile: null
+                };
+                showForm.value = true;
+            };
+
+            const openEditModal = (emp) => {
+                isEditing.value = true;
+                form.value = { 
+                    ...emp,
+                    avatarFile: null
+                };
+                showForm.value = true;
+            };
+
+            const formErrors = reactive({
+                username: '',
+                name: '',
+                phone: '',
+                job: '',
+                salary: '',
+                entryDate: ''
+            });
+
+            // 验证用户名
+            const validateUsername = (value) => {
+                if (!value) {
+                    formErrors.username = '用户名不能为空';
+                    return false;
+                }
+                if (value.length < 3 || value.length > 20) {
+                    formErrors.username = '用户名长度必须在3-20个字符之间';
+                    return false;
+                }
+                formErrors.username = '';
+                return true;
+            };
+
+            // 验证姓名
+            const validateName = (value) => {
+                if (!value) {
+                    formErrors.name = '姓名不能为空';
+                    return false;
+                }
+                if (value.length < 2 || value.length > 20) {
+                    formErrors.name = '姓名长度必须在2-20个字符之间';
+                    return false;
+                }
+                formErrors.name = '';
+                return true;
+            };
+
+            // 修改手机号验证函数
+            const validatePhone = (value) => {
+                if (!value) {
+                    formErrors.phone = '手机号不能为空';
+                    return false;
+                }
+                const phoneRegex = /^1[3-9]\d{9}$/;
+                if (!phoneRegex.test(value)) {
+                    formErrors.phone = '请输入正确的手机号码';
+                    return false;
+                }
+                formErrors.phone = '';
+                return true;
+            };
+
+            // 验证职位
+            const validateJob = (value) => {
+                if (!value) {
+                    formErrors.job = '职位不能为空';
+                    return false;
+                }
+                formErrors.job = '';
+                return true;
+            };
+
+            // 验证薪资
+            const validateSalary = (value) => {
+                if (!value) {
+                    formErrors.salary = '薪资不能为空';
+                    return false;
+                }
+                if (isNaN(value) || value < 0) {
+                    formErrors.salary = '请输入有效的薪资';
+                    return false;
+                }
+                formErrors.salary = '';
+                return true;
+            };
+
+            // 验证入职日期
+            const validateEntryDate = (value) => {
+                if (!value) {
+                    formErrors.entryDate = '入职日期不能为空';
+                    return false;
+                }
+                formErrors.entryDate = '';
+                return true;
+            };
+
+            // 验证所有字段
+            const validateForm = () => {
+                const validations = [
+                    validateUsername(form.value.username),
+                    validateName(form.value.name),
+                    validatePhone(form.value.phone),
+                    validateJob(form.value.job),
+                    validateSalary(form.value.salary),
+                    validateEntryDate(form.value.entryDate)
+                ];
+                return validations.every(v => v);
+            };
+
+            // 修改提交函数
+            const submit = async () => {
+                if (!validateForm()) {
+                    showToast('请完善表单信息', 'error');
+                    return;
+                }
+
+                try {
+                    // 只在新增员工时检查手机号是否已存在
+                    if (!isEditing.value) {
+                        try {
+                            const response = await axios.get(`/emps/check-phone`, {
+                                params: { phone: form.value.phone }
+                            });
+                            console.log('Phone check response:', response.data); // 添加日志
+                            // 检查返回的数据中是否有记录
+                            if (response.data.data && response.data.data.total > 0) {
+                                formErrors.phone = '该手机号已被使用';
+                                showToast('该手机号已被使用', 'error');
+                                return;
+                            }
+                        } catch (error) {
+                            console.error('Phone check error:', error);
+                            if (error.response && error.response.data) {
+                                formErrors.phone = error.response.data.message || '检查手机号失败';
+                                showToast(error.response.data.message || '检查手机号失败', 'error');
+                            } else {
+                                formErrors.phone = '检查手机号失败';
+                                showToast('检查手机号失败', 'error');
+                            }
+                            return;
+                        }
+                    }
+
+                    let imageUrl = form.value.image;
+                    
+                    if (form.value.avatarFile) {
+                        const formData = new FormData();
+                        formData.append('file', form.value.avatarFile);
+                        const uploadRes = await axios.post('/upload', formData, {
+                            headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        imageUrl = uploadRes.data.data;
+                    }
+
+                    const submitData = {
+                        ...form.value,
+                        image: imageUrl
+                    };
+                    delete submitData.avatarFile;
+
+                    const url = '/emps';
+                    const method = isEditing.value ? axios.put : axios.post;
+                    await method(url, submitData);
+                    
+                    showToast('保存成功');
+                    showForm.value = false;
+                    fetchData();
+                } catch (error) {
+                    if (error.response && error.response.data) {
+                        showToast(error.response.data.message || '保存失败', 'error');
+                    } else {
+                        showToast('保存失败', 'error');
+                    }
+                }
+            };
+
+            // 修改输入验证处理函数
+            const handleInput = async (field, value, validator) => {
+                if (field === 'phone') {
+                    await validator(value);
+                } else {
+                    validator(value);
+                }
+            };
+
+            const deleteEmp = (id) => {
+                if (confirm('确定要删除该员工吗？')) {
+                    axios.delete(`/emps/${id}`)
+                        .then(() => {
+                            showToast('删除成功');
+                            fetchData();
+                        })
+                        .catch(() => showToast('删除失败', 'error'));
+                }
+            };
+
+            const addProject = () => {
+                form.value.children.push({ begin: '', end: '', company: '', job: '' });
+            };
+
+            const removeProject = (index) => {
+                form.value.children.splice(index, 1);
+            };
+
+            const handleAvatarUpload = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // 创建本地预览URL
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    form.value.image = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                // 保存文件对象供后续上传
+                form.value.avatarFile = file;
+            };
+
+            const handlePageSizeChange = () => {
+                page.value = 1; // 切换每页显示数量时重置到第一页
+                fetchData();
+            };
+
+            fetchDepts();
+            fetchData();
+
+            return {
+                depts,
+                emps,
+                searchEmp,
+                form,
+                showForm,
+                toastMessage,
+                toastType,
+                page,
+                totalPages,
+                total,
+                genderMap,
+                prevPage,
+                nextPage,
+                search,
+                openAddForm,
+                openEditModal,
+                submit,
+                deleteEmp,
+                addProject,
+                removeProject,
+                handleAvatarUpload,
+                pageSize,
+                handlePageSizeChange,
+                validateUsername,
+                validateName,
+                validatePhone,
+                validateJob,
+                validateSalary,
+                validateEntryDate,
+                formErrors,
+                handleInput
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
