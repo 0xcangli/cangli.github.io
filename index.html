@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的博客</title>
     <!-- 引入Vue.js -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="./js/vue.global.js"></script>
     <!-- 引入样式库 -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="./css/tailwind.min.css" rel="stylesheet">
     <!-- 引入优雅字体 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="./css/css2.css" rel="stylesheet">
     <!-- 引入图标 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="./css/all.min.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Noto Sans SC', sans-serif;
@@ -181,36 +181,20 @@
                         github: 'https://github.com/0xcangli'
                     },
                     navItems: [
-                        { id: 1, name: '首页', link: 'https://github.com/0xcangli' },
-                        { id: 2, name: '文章', link: '#' },
-                        { id: 3, name: '项目', link: '#' },
-                        { id: 4, name: '关于', link: '#' }
+                        { id: 1, name: '首页', link: '/' },
+                        { id: 2, name: '文章', link: '/posts' },
+                        { id: 3, name: '项目', link: '/projects' },
+                        { id: 4, name: '关于', link: '/about' }
                     ],
                     blogPosts: [
                         {
                             id: 1,
-                            title: '生活随笔',
-                            excerpt: '记录生活中的点点滴滴，分享美好时刻...',
-                            date: '2024-03-20',
+                            title: 'Linux常见文件目录命令',
+                            excerpt: '本文介绍了Linux中的常用文件目录命令...',
+                            date: '2025-06-18',
                             coverImage: './image/blog1.jpg',
                             link: '#'
                         },
-                        {
-                            id: 2,
-                            title: '读书笔记',
-                            excerpt: '分享最近阅读的好书，记录阅读心得...',
-                            date: '2024-03-18',
-                            coverImage: './image/blog1.jpg',
-                            link: '#'
-                        },
-                        {
-                            id: 3,
-                            title: '旅行日记',
-                            excerpt: '记录旅途中的风景和故事...',
-                            date: '2024-03-15',
-                            coverImage: './image/blog1.jpg',
-                            link: '#'
-                        }
                     ]
                 }
             }
